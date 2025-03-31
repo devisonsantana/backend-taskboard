@@ -1,26 +1,33 @@
 package org.boardtask.app.service;
 
-import java.sql.Connection;
-import java.sql.SQLException;
-
-import org.boardtask.app.dao.UserDAO;
+import org.boardtask.app.dto.user.UserRequestDTO;
 import org.boardtask.app.entity.UserEntity;
+import org.boardtask.app.repository.UserRepository;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
+@Service
 public class UserService {
-    private final Connection connection;
+    @Autowired
+    private UserRepository repository;
+    @Autowired
+    private PasswordEncoder encoder;
 
-    public UserService(Connection connection) {
-        this.connection = connection;
+    @Transactional
+    public UserEntity insert(UserRequestDTO request) {
+        var entity = new UserEntity();
+        entity.setUsername(request.username());
+        entity.setPassword(encoder.encode(request.password()));
+        return repository.save(entity);
     }
 
-    public UserEntity insert(UserEntity entity) throws SQLException {
-        try {
-            new UserDAO(connection).insert(entity);
-            connection.commit();
-            return entity;
-        } catch (SQLException e) {
-            connection.rollback();
-            throw e;
+    public UserEntity findById(Long id){
+        var optional = repository.findById(id);
+        if (optional.isPresent()) {
+            return optional.get();
         }
+        return null;
     }
 }
