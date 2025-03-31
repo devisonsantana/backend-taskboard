@@ -1,5 +1,6 @@
 package org.boardtask.app.entity;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -18,8 +19,15 @@ public class UserEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+    @Column(unique = true, nullable = false)
     private String username;
+    @Column(nullable = false)
     private String password;
+
+    public UserEntity(String username, String password) {
+        this.username = username;
+        this.password = password;
+    }
 
     @Override
     public int hashCode() {

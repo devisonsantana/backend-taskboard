@@ -1,12 +1,15 @@
 package org.boardtask.app.service;
 
 import org.boardtask.app.dto.user.UserRequestDTO;
+import org.boardtask.app.dto.user.UserResponseDTO;
 import org.boardtask.app.entity.UserEntity;
 import org.boardtask.app.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import jakarta.persistence.EntityNotFoundException;
 
 @Service
 public class UserService {
@@ -16,18 +19,27 @@ public class UserService {
     private PasswordEncoder encoder;
 
     @Transactional
-    public UserEntity insert(UserRequestDTO request) {
-        var entity = new UserEntity();
-        entity.setUsername(request.username());
-        entity.setPassword(encoder.encode(request.password()));
+    public UserEntity insert(UserRequestDTO user) {
+        var entity = new UserEntity(user.username(), encoder.encode(user.password()));
         return repository.save(entity);
     }
 
-    public UserEntity findById(Long id){
+    public UserResponseDTO findById(Long id) {
         var optional = repository.findById(id);
         if (optional.isPresent()) {
-            return optional.get();
+            var dto = optional.get();
+            return new UserResponseDTO(dto.getId(), dto.getUsername());
         }
-        return null;
+        throw new EntityNotFoundException();
     }
+
+    public UserResponseDTO findByUsername(String username) {
+        var optional = repository.findByUsername(username);
+        if (optional.isPresent()) {
+            var dto = optional.get();
+            return new UserResponseDTO(dto.getId(), dto.getUsername());
+        }
+        throw new EntityNotFoundException();
+    }
+
 }
