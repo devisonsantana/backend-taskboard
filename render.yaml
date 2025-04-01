@@ -1,0 +1,17 @@
+services:
+- type: web
+  name: taskmanager
+  runtime: docker
+  repo: https://github.com/devisonsantana/backend-taskboard
+  plan: free
+  envVars:
+  - key: DB_PASSWORD
+    sync: false
+  - key: DB_USERNAME
+    sync: false
+  - key: DB_URL
+    sync: false
+  region: frankfurt
+  dockerContext: .
+  dockerfilePath: ./Dockerfile
+version: "1"
