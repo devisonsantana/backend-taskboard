@@ -1,10 +1,13 @@
-FROM maven:jdk-21 AS build
+FROM eclipse-temurin:21.0.6_7-jdk-alpine-3.21 AS build
 
 WORKDIR /app
 
-COPY . .
+COPY pom.xml ./
+COPY mvnw ./
+COPY .mvn ./.mvn
+COPY src ./src/
 
-RUN mvn clean package -DskipTests
+RUN ./mvnw clean install -DskipTests
 
 FROM eclipse-temurin:21-jre-alpine
 
