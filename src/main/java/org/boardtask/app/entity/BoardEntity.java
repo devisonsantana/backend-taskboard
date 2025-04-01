@@ -2,6 +2,9 @@ package org.boardtask.app.entity;
 
 import java.util.List;
 
+import org.boardtask.app.dto.board.BoardRequestDTO;
+import org.boardtask.app.dto.user.UserResponseDTO;
+
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -32,4 +35,12 @@ public class BoardEntity {
     private UserEntity user;
     @OneToMany(mappedBy = "board", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<BoardColumnEntity> boardColumns;
+
+    public BoardEntity(BoardRequestDTO board, UserResponseDTO dataUser) {
+        name = board.name();
+        
+        user = new UserEntity();
+        user.setId(dataUser.id());
+        user.setUsername(dataUser.username());
+    }
 }
