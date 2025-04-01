@@ -3,7 +3,6 @@ package org.boardtask.app.service;
 import org.boardtask.app.dto.board.BoardRequestDTO;
 import org.boardtask.app.dto.board.BoardResponseDTO;
 import org.boardtask.app.entity.BoardEntity;
-import org.boardtask.app.entity.UserEntity;
 import org.boardtask.app.repository.BoardRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
