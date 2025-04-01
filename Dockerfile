@@ -1,17 +1,17 @@
-FROM ubuntu:latest AS build
+FROM maven:3.8.6-openjdk-21 AS build
 
-RUN apt-get update && apt-get install openjdk-21-jdk -y
+WORKDIR /app
 
 COPY . .
 
-RUN apt-get install maven -y
+RUN mvn clean package -DskipTests
 
-RUN mvn clean install -DskipTest
+FROM eclipse-temurin:21-jre-alpine
 
-FROM eclipse-temurin:21-alpine
+WORKDIR /app
 
 EXPOSE 8080
 
-COPY --from=build /target/*.jar app.jar
+COPY --from=build /app/target/*.jar app.jar
 
-ENTRYPOINT [ "java", "-jar", "app.jar" ]
+ENTRYPOINT ["java", "-jar", "app.jar"]
