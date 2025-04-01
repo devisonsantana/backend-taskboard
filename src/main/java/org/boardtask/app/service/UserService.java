@@ -9,6 +9,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import jakarta.persistence.EntityExistsException;
 import jakarta.persistence.EntityNotFoundException;
 
 @Service
@@ -19,9 +20,21 @@ public class UserService {
     private PasswordEncoder encoder;
 
     @Transactional
-    public UserEntity insert(UserRequestDTO user) {
+    public UserResponseDTO insert(UserRequestDTO user) {
+        if (repository.findByUsername(user.username()).isPresent()) {
+            throw new EntityExistsException();
+        }
         var entity = new UserEntity(user.username(), encoder.encode(user.password()));
-        return repository.save(entity);
+        entity = repository.save(entity);
+        return new UserResponseDTO(entity.getId(), entity.getUsername());
+    }
+
+    @Transactional
+    public void deleteByUsername(String username) {
+        if (!repository.existsByUsername(username)) {
+            throw new EntityNotFoundException();
+        }
+        repository.deleteByUsername(username);
     }
 
     public UserResponseDTO findById(Long id) {
@@ -36,8 +49,7 @@ public class UserService {
     public UserResponseDTO findByUsername(String username) {
         var optional = repository.findByUsername(username);
         if (optional.isPresent()) {
-            var dto = optional.get();
-            return new UserResponseDTO(dto.getId(), dto.getUsername());
+            return optional.get();
         }
         throw new EntityNotFoundException();
     }
