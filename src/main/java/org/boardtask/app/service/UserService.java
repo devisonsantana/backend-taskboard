@@ -9,6 +9,7 @@ import org.boardtask.app.infra.exception.handler.UserEntityAlreadyExistsExceptio
 import org.boardtask.app.infra.exception.handler.UserEntityNotFoundException;
 import org.boardtask.app.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -56,6 +57,28 @@ public class UserService {
 
     public boolean existsByUsername(String username) {
         return repository.existsByUsername(username);
+    }
+
+    @Transactional
+    @Modifying
+    public void updateUsername(Long id, String newUsername) {
+        if (existsByUsername(newUsername)) {
+            throw new UserEntityAlreadyExistsException(newUsername);
+        }
+        int rowsAffected = repository.updateUsernameById(id, newUsername);
+        if (rowsAffected == 0)
+            throw new UserEntityNotFoundException();
+    }
+
+    @Transactional
+    @Modifying
+    public void updateUsername(String oldUsername, String newUsername) {
+        if (existsByUsername(newUsername)) {
+            throw new UserEntityAlreadyExistsException(newUsername);
+        }
+        int rowsAffected = repository.updateUsernameByUsername(oldUsername, newUsername);
+        if (rowsAffected == 0)
+            throw new UserEntityNotFoundException(oldUsername);
     }
 
     @Transactional

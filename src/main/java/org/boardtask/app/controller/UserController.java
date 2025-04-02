@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.util.UriComponentsBuilder;
@@ -22,7 +23,7 @@ public class UserController {
     @Autowired
     private UserService service;
 
-    @GetMapping("/id/{id}")
+    @GetMapping("/uid/{id}")
     public ResponseEntity<UserResponseDTO> findUserById(@PathVariable Long id) {
         var user = service.findById(id);
         return ResponseEntity.ok(user);
@@ -34,7 +35,7 @@ public class UserController {
         return ResponseEntity.ok(user);
     }
 
-    @GetMapping("/all")
+    @GetMapping("/u/all")
     public ResponseEntity<List<UserResponseDTO>> showAll() {
         var users = service.findAll();
         return ResponseEntity.ok().body(users);
@@ -48,7 +49,19 @@ public class UserController {
         return ResponseEntity.created(uri).body(user);
     }
 
-    @DeleteMapping("/id/{id}")
+    @PutMapping("/uid/{id}/{newUsername}")
+    public ResponseEntity<Void> renameById(@PathVariable Long id, @PathVariable String newUsername) {
+        service.updateUsername(id, newUsername);
+        return ResponseEntity.noContent().build();
+    }
+
+    @PutMapping("/u/{oldUsername}/{newUsername}")
+    public ResponseEntity<Void> renameByUsername(@PathVariable String oldUsername, @PathVariable String newUsername) {
+        service.updateUsername(oldUsername, newUsername);
+        return ResponseEntity.noContent().build();
+    }
+
+    @DeleteMapping("/uid/{id}")
     public ResponseEntity<Void> delete(@PathVariable Long id) {
         service.deleteById(id);
         return ResponseEntity.noContent().build();
