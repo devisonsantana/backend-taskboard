@@ -44,7 +44,7 @@ public class BoardService {
     @Transactional
     public void deleteById(String username, Long boardId) {
         var userId = userService.findByUsername(username).id();
-        if (!repository.existsByIdAndUserId(userId, boardId)) {
+        if (!repository.existsByUserIdAndBoardId(userId, boardId)) {
             throw new BoardEntityNotFoundException();
         }
         repository.deleteById(boardId);

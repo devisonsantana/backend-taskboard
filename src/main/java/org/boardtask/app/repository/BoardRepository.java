@@ -18,6 +18,15 @@ public interface BoardRepository extends JpaRepository<BoardEntity, Long> {
     @Query(value = "select id, name from board where user_id = :userId and id = :boardId", nativeQuery = true)
     Optional<BoardResponseDTO> findByUserIdAndBoardId(@Param("userId") Long userId, @Param("boardId") Long boardId);
 
-    boolean existsByIdAndUserId(Long boardId, Long userId);
+    @Query("""
+            select case when exists (
+                select 1 from BoardEntity b where b.user.id = :userId and b.id = :boardId
+            ) then 
+                true
+            else
+                false
+            end
+            """)
+    boolean existsByUserIdAndBoardId(@Param("userId") Long userId, @Param("boardId") Long boardId);
 
 }
