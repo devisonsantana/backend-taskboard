@@ -8,6 +8,7 @@ import org.boardtask.app.entity.BoardEntity;
 import org.boardtask.app.infra.exception.handler.BoardEntityNotFoundException;
 import org.boardtask.app.repository.BoardRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -39,6 +40,15 @@ public class BoardService {
     public List<BoardResponseDTO> findAll(String username) {
         var userId = userService.findByUsername(username).id();
         return repository.findAll(userId);
+    }
+
+    @Transactional
+    @Modifying
+    public void update(String username, Long boardId, String newName) {
+        var userId = userService.findByUsername(username).id();
+        var rowsAffected = repository.updateById(newName, boardId, userId);
+        if (rowsAffected == 0)
+            throw new BoardEntityNotFoundException();
     }
 
     @Transactional
