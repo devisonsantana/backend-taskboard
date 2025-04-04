@@ -2,8 +2,11 @@ package org.boardtask.app.controller;
 
 import java.util.List;
 
-import org.boardtask.app.dto.board.BoardRequestDTO;
+import org.boardtask.app.dto.board.BoardDetailsResponseDTO;
+import org.boardtask.app.dto.board.BoardInsertRequestDTO;
+import org.boardtask.app.dto.board.BoardInsertResponseDTO;
 import org.boardtask.app.dto.board.BoardResponseDTO;
+import org.boardtask.app.dto.column.BoardColumnDetailsResponseDTO;
 import org.boardtask.app.service.BoardService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -12,21 +15,27 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.util.UriComponentsBuilder;
 
-import jakarta.validation.Valid;
-
 @RestController
-@RequestMapping("/{username}/board")
+@RequestMapping("/u/{username}/b")
 public class BoardController {
     @Autowired
     private BoardService service;
 
     @GetMapping("/{id}")
-    public ResponseEntity<BoardResponseDTO> findById(@PathVariable String username, @PathVariable Long id) {
+    public ResponseEntity<BoardDetailsResponseDTO> findById(@PathVariable String username, @PathVariable Long id) {
         var board = service.findById(username, id);
+        return ResponseEntity.ok().body(board);
+    }
+
+    @GetMapping("/{boardId}/col/{columnId}")
+    public ResponseEntity<BoardColumnDetailsResponseDTO> findColumnById(@PathVariable("username") String username,
+            @PathVariable("boardId") Long boarId, @PathVariable("columnId") Long columnId) {
+        var board = service.findColumnById(username, boarId, columnId);
         return ResponseEntity.ok().body(board);
     }
 
@@ -37,11 +46,12 @@ public class BoardController {
     }
 
     @PostMapping
-    public ResponseEntity<BoardResponseDTO> create(@PathVariable String username, @Valid BoardRequestDTO board,
-            UriComponentsBuilder uriBuilder) {
-        var dto = service.insert(username, board);
-        var uri = uriBuilder.path("/{username}/{id}").buildAndExpand(username, dto.id()).toUri();
-        return ResponseEntity.created(uri).body(dto);
+    public ResponseEntity<BoardInsertResponseDTO> create(@PathVariable String username,
+            @RequestBody BoardInsertRequestDTO entity,
+            UriComponentsBuilder builder) {
+        var board = service.insert(username, entity);
+        var uri = builder.path("/u/{username}/b/{id}").buildAndExpand(username, board.boardId()).toUri();
+        return ResponseEntity.created(uri).body(board);
     }
 
     @PutMapping("/{id}/{newName}")

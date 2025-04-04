@@ -3,7 +3,6 @@ package org.boardtask.app.repository;
 import java.util.List;
 import java.util.Optional;
 
-import org.boardtask.app.dto.board.BoardResponseDTO;
 import org.boardtask.app.entity.BoardEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
@@ -13,11 +12,13 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface BoardRepository extends JpaRepository<BoardEntity, Long> {
-    @Query(value = "select id, name from board where user_id = :id", nativeQuery = true)
-    List<BoardResponseDTO> findAll(@Param("id") Long id);
+    @Query(value = "select * from board where user_id = :userId and id = :boardId", nativeQuery = true)
+    Optional<BoardEntity> findByUserIdAndBoardId(@Param("userId") Long userId, @Param("boardId") Long boardId);
 
-    @Query(value = "select id, name from board where user_id = :userId and id = :boardId", nativeQuery = true)
-    Optional<BoardResponseDTO> findByUserIdAndBoardId(@Param("userId") Long userId, @Param("boardId") Long boardId);
+    // Optional<BoardResponseDTO> findByUserIdAndBoardId(@Param("userId") Long
+    // userId, @Param("boardId") Long boardId);
+    @Query(value = "select * from board where user_id = :id", nativeQuery = true)
+    List<BoardEntity> findAll(@Param("id") Long id);
 
     @Query("""
             select case when exists (
