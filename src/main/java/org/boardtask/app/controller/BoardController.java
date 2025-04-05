@@ -21,7 +21,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.util.UriComponentsBuilder;
 
 @RestController
-@RequestMapping("/u/{username}/b")
+@RequestMapping("/u/{username}/board")
 public class BoardController {
     @Autowired
     private BoardService service;
@@ -32,7 +32,7 @@ public class BoardController {
         return ResponseEntity.ok().body(board);
     }
 
-    @GetMapping("/{boardId}/col/{columnId}")
+    @GetMapping("/{boardId}/column/{columnId}")
     public ResponseEntity<BoardColumnDetailsResponseDTO> findColumnById(@PathVariable("username") String username,
             @PathVariable("boardId") Long boarId, @PathVariable("columnId") Long columnId) {
         var board = service.findColumnById(username, boarId, columnId);
@@ -50,7 +50,7 @@ public class BoardController {
             @RequestBody BoardInsertRequestDTO entity,
             UriComponentsBuilder builder) {
         var board = service.insert(username, entity);
-        var uri = builder.path("/u/{username}/b/{id}").buildAndExpand(username, board.boardId()).toUri();
+        var uri = builder.path("/u/{username}/board/{id}").buildAndExpand(username, board.boardId()).toUri();
         return ResponseEntity.created(uri).body(board);
     }
 
